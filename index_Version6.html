@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <title>استعلام النتائج</title>
+  <meta name="description" content="صفحة استعلام نتائج مواد الطالب في جامعة المنوفية الأهلية حسب الاسم والرقم القومي.">
+  <style>
+    body {
+      background-image: url('https://mnustdch.menofia.education/static/bg.jpg');
+      background-size: cover;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      color: white;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      margin-top: 60px;
+      background-color: rgba(0, 0, 0, 0.6);
+      display: inline-block;
+      padding: 30px 20px 30px 20px;
+      border-radius: 15px;
+      min-width: 340px;
+      box-sizing: border-box;
+    }
+
+    h1 {
+      margin-bottom: 30px;
+      font-size: 28px;
+      color: #ffd700;
+    }
+
+    input {
+      display: block;
+      margin: 15px auto;
+      padding: 12px;
+      width: 250px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+    }
+
+    button {
+      padding: 12px 25px;
+      font-size: 18px;
+      background-color: #00aaff;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      margin-top: 15px;
+      margin-bottom: 10px;
+    }
+
+    button:hover {
+      background-color: #0088cc;
+    }
+
+    .uni-name {
+      font-size: 24px;
+      margin-top: 40px;
+      color: #ffffff;
+      text-shadow: 1px 1px 3px black;
+    }
+
+    .result-section {
+      margin-top: 30px;
+      display: none;
+      animation: fadeIn 0.8s;
+    }
+
+    table {
+      margin: 20px auto 10px auto;
+      background-color: rgba(0, 0, 0, 0.6);
+      border-collapse: collapse;
+      width: 100%;
+      max-width: 450px;
+    }
+    th, td {
+      border: 1px solid #fff;
+      padding: 10px;
+      font-size: 18px;
+    }
+    th {
+      color: #ffd700;
+    }
+    .summary {
+      margin-top: 20px;
+      font-size: 20px;
+      color: #ffd700;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px);}
+      to { opacity: 1; transform: translateY(0);}
+    }
+  </style>
+</head>
+<body>
+  <div class="uni-name">Al Monufia National University</div>
+  <div class="container">
+    <h1>استعلام نتائج المواد</h1>
+    <div class="input-section">
+      <input type="text" id="name" placeholder="ادخل اسمك" autocomplete="off" />
+      <input type="text" id="nid" placeholder="ادخل رقمك القومي" autocomplete="off" maxlength="14"/>
+      <button id="showBtn" onclick="showResult()">عرض النتيجة</button>
+    </div>
+    <div class="result-section" id="resultSection">
+      <div id="studentName"></div>
+      <table>
+        <thead>
+          <tr>
+            <th>المادة</th>
+            <th>عدد الساعات</th>
+            <th>التقدير</th>
+          </tr>
+        </thead>
+        <tbody id="gradesTable"></tbody>
+      </table>
+      <div class="summary">
+        <p>عدد الساعات المعتمدة: 14</p>
+        <p>المعدل الفصلي: 3.6</p>
+        <p>المعدل التراكمي: 2.4</p>
+      </div>
+    </div>
+  </div>
+  <script>
+    const subjects = [
+      "استاتيكا",
+      "ماث 1",
+      "فيزيا 1",
+      "رسم على الحاسب",
+      "هندسة تصنيع"
+    ];
+    const hours = 3;
+    const gradesList = ["A", "B", "C"];
+
+    // توليد تقديرات ثابتة لكل شخص لكل مادة
+    function getDeterministicGrade(subject, studentName, nid) {
+      const seed = studentName + nid + subject;
+      let hash = 0;
+      for (let i = 0; i < seed.length; i++) {
+        hash = seed.charCodeAt(i) + ((hash << 5) - hash);
+      }
+      return gradesList[Math.abs(hash) % gradesList.length];
+    }
+
+    function showResult() {
+      const name = document.getElementById('name').value.trim();
+      const nid = document.getElementById('nid').value.trim();
+      if (!name || !nid || !/^[0-9]{14}$/.test(nid)) {
+        alert("من فضلك ادخل الاسم والرقم القومي (14 رقم).");
+        return;
+      }
+
+      // عرض الاسم
+      document.getElementById('studentName').innerText = 'الاسم: ' + name;
+
+      // بناء الجدول
+      const tbody = document.getElementById('gradesTable');
+      tbody.innerHTML = "";
+      subjects.forEach(sub => {
+        const grade = getDeterministicGrade(sub, name, nid);
+        const row = `<tr><td>${sub}</td><td>${hours}</td><td>${grade}</td></tr>`;
+        tbody.innerHTML += row;
+      });
+
+      // إظهار النتائج
+      document.getElementById('resultSection').style.display = 'block';
+      // منع تكرار ظهور النتائج عند تكرار الضغط
+      document.querySelector('.input-section').style.display = 'none';
+    }
+  </script>
+</body>
+</html>
